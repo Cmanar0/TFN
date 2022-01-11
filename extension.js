@@ -27,9 +27,42 @@ function activate(context) {
   );
 
   context.subscriptions.push(disposable);
+
+  vscode.languages.registerHoverProvider("javascript", {
+    provideHover(document, position) {
+      const range = document.getWordRangeAtPosition(position);
+      const word = document.getText(range);
+      if (
+        typeof word == "undefined" ||
+        typeof word == "object" ||
+        typeof word == "boolean" ||
+        typeof word == "number" ||
+        typeof word == "string" ||
+        typeof word == "symbol" ||
+        typeof word == "function" ||
+        typeof word == "bigint"
+      ) {
+        if (
+          word === "null" ||
+          word === "0" ||
+          word === "''" ||
+          word === "undefined"
+        ) {
+          return new vscode.Hover({
+            language: "javascript",
+            value: "Truthy: False",
+          });
+        } else {
+          return new vscode.Hover({
+            language: "javascript",
+            value: "Truthy: True",
+          });
+        }
+      }
+    },
+  });
 }
 
-// this method is called when your extension is deactivated
 function deactivate() {}
 
 module.exports = {
